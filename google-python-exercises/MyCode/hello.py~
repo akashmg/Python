@@ -1,0 +1,18 @@
+#!/user/bin/python
+
+# Using sys
+"""
+A program that takes an argument from the terminal and prints it
+"""
+
+import sys
+
+def main():
+    if len(sys.argv) >= 2:
+        name = sys.argv[1]
+        print "Hello" + name + "\nBuenos Dias!\n"
+    else:
+        print "Program is empty!"
+
+if __name__ == '__main__':
+    main()
