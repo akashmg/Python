@@ -16,22 +16,20 @@ import commands
 """
 
 def get_special_paths(dirs):
-  specialFiles = [[]]
+  specialFiles = []
+  bnames = []
   while dirs:
     allFiles = os.listdir(dirs[0])
     for filename in allFiles:
       match = re.search(r'[\w-]+__[\w-]+__[\w.]+', filename)
       if match:
-        if not specialFiles:
-          specialFiles.append([dirs[0], match.group()])
-          # print specialFiles
-        else:
-          print specialFiles[:][0]
-          # print specialFiles[:][1]
-          if filename in specialFiles[:][0]:
-            print 'duplicate'
+          specialFiles.append(os.path.join(dirs[0],match.group()))
+          bnames.append(match.group())
 
     dirs.pop(0) # Go to the next directory
+    if len(set(bnames)) < len(bnames):
+      print "error: duplicate file name"
+      sys.exit(1)
 
   return specialFiles
 
@@ -44,6 +42,12 @@ def copy_to(files, todir):
     basename = os.path.basename(fname)
     shutil.copy(fname, os.path.join(todirpath, basename))
 
+def zip_to(paths, tozip):
+  print "Command to be executed : zip -j %s.zip %s" % (tozip, ' '.join(paths))
+  cmd = 'zip -j %s %s' % (tozip, ' '.join(paths))
+  (status, output) = commands.getstatusoutput(cmd)
+  if status != 0:
+    print output
 
 def main():
   # This basic command line argument parsing code is provided.
@@ -85,9 +89,11 @@ def main():
     del args[0]
 
   specialFiles = get_special_paths(dirs)
-  print specialFiles
   if todir != '':
     copy_to(specialFiles, todir)
+
+  if tozip != '':
+    zip_to(specialFiles, tozip)
   
 if __name__ == "__main__":
   main()
